@@ -1,0 +1,135 @@
+import React, { useEffect, useState } from "react";
+
+function Card({
+  title,
+  text,
+  target,
+  linkTitle,
+  href,
+  rel,
+  onClick,
+  linkClassName,
+}) {
+  return (
+    <div className="card">
+      <div className="card__title">{title}</div>
+
+      <div className="card__text">{text}</div>
+      <a
+        className={`default-link card__link ${linkClassName}`}
+        target={target}
+        rel={rel}
+        href={href}
+        onClick={onClick}
+      >
+        {linkTitle}
+      </a>
+    </div>
+  );
+}
+
+export default function Page() {
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const data = await fetch(
+      `https://my-json-server.typicode.com/savayer/demo/posts`
+    );
+    const json = await data.json();
+    setCards(json);
+    console.log(json);
+  };
+
+  function analyticsTrackClick(url) {
+    // sending clicked link url to analytics
+    console.log(url);
+  }
+
+  return (
+    <>
+      <style>
+        {`
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+        h2 {
+            margin-bottom: 30px;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            min-width: 1000px;
+            margin: 1em auto;
+            justify-content: space-between;
+        }
+        .card {
+            width: 32%;
+            border: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        }
+        @media only screen and (max-width: 768px) {
+            .card {
+                width: 100%;
+            }
+        }
+        .card__title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .card__text {
+            color: #999999;
+            min-height: 2.8em;
+            line-height: 1.4em;
+        }
+        a.default-link.card__link {
+            display: inline-block !important;
+            max-width: 130px;
+            background: #4269eb;
+            border-radius: 4px;
+            box-sizing: border-box;
+            padding: 7px 10px;
+            margin-top: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: #ffffff;
+            text-transform: capitalize;
+        }
+        a.default-link.card__link:hover {
+            background: #000000;
+            color: #ffffff !important;
+        }
+        a.default-link.card__link.card__link--red {
+               color:red;
+            }`}
+      </style>
+      <div className="container">
+        <h2>Testing</h2>
+        <div className="cards">
+          {cards?.map((item) => {
+            return (
+              <Card
+                key={item.id}
+                title={item.title?.en}
+                //   text={item.body?.en.substr(0, 50) + "..."}
+                text={item.body ? item.body?.en.substr(0, 50) + "..." : ""}
+                target={item.id == 1 ? "_blank" : ""}
+                href={item.link}
+                linkTitle={item.link_title}
+                linkClassName={item.id == 1 ? "card__link--red" : ""}
+                onClick={() => analyticsTrackClick(item.link)}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
